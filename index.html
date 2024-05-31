@@ -13,8 +13,8 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: black;
             color: white;
+            background-color: black;
         }
 
         #price-container {
@@ -24,25 +24,23 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: black;
         }
 
         h1,
         h2,
         h3 {
-            color: white;
             font-size: calc(10vw + 10vh);
             margin: 0;
         }
 
         .title {
             font-size: calc(5vw + 5vh);
-            color: gray;
+            opacity: 0.5;
         }
 
         #timer {
             font-size: calc(2vw + 2vh);
-            color: gray;
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -74,6 +72,18 @@
                     const price = data.bpi.USD.rate;
                     const price_fixed = parseFloat(price.replace(/,/g, '')).toFixed(2);
                     document.getElementById('price').textContent = price_fixed;
+                    fetch('https://api.coindesk.com/v1/bpi/historical/close.json?for=yesterday')
+                        .then(response => response.json())
+                        .then(data => {
+                            const currentPrice = parseFloat(price.replace(/,/g, ''));
+                            const pastPrice = Object.values(data.bpi)[0];
+                            if (currentPrice > pastPrice) {
+                                document.body.style.backgroundColor = 'darkgreen';
+                            } else {
+                                document.body.style.backgroundColor = 'darkred';
+                            }
+                        })
+                        .catch(error => console.error('Error fetching Bitcoin price:', error));
                 })
                 .catch(error => console.error('Error fetching Bitcoin price:', error));
             startCountdown();
